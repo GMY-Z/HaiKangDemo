@@ -41,11 +41,11 @@ public class Haikang {
     public void initInformation() {
         //初始化的参数
         lUserID = -1;
-        lAlarmHandle =-1;
+        lAlarmHandle = -1;
         haikangimp = null;
         //注册
         Boolean login = this.Login();
-        if (login){
+        if (login) {
             //注册成功就进行布防
             this.SetupAlarmChan();
         }
@@ -59,18 +59,18 @@ public class Haikang {
      */
     public Boolean Login() {
         //初始化
-    hCNetSDK.NET_DVR_Init();
+        hCNetSDK.NET_DVR_Init();
 
-    //注册之前先注销已注册的用户,预览情况下不可注销
-    if (lUserID > -1) {
-        //先注销
-        hCNetSDK.NET_DVR_Logout(lUserID);
-        lUserID = -1;
-    }
+        //注册之前先注销已注册的用户,预览情况下不可注销
+        if (lUserID > -1) {
+            //先注销
+            hCNetSDK.NET_DVR_Logout(lUserID);
+            lUserID = -1;
+        }
 
-    boolean initSuc = hCNetSDK.NET_DVR_Init();
+        boolean initSuc = hCNetSDK.NET_DVR_Init();
         if (initSuc != true) {
-            System.out.println("初始化失败"+ "  失败原因是：" + hCNetSDK.NET_DVR_GetLastError());
+            System.out.println("初始化失败" + "  失败原因是：" + hCNetSDK.NET_DVR_GetLastError());
         } else {
             System.out.println("接口初始化成功");
         }
@@ -97,7 +97,7 @@ public class Haikang {
             haikangimp = new Haikangimp();
             Pointer pUser = null;
             if (!hCNetSDK.NET_DVR_SetDVRMessageCallBack_V30(haikangimp, pUser)) {
-                System.out.println("设置回调函数失败!"+ "  失败原因是：" + hCNetSDK.NET_DVR_GetLastError());
+                System.out.println("设置回调函数失败!" + "  失败原因是：" + hCNetSDK.NET_DVR_GetLastError());
             }
         }
         HCNetSDK.NET_DVR_SETUPALARM_PARAM m_strAlarmInfo = new HCNetSDK.NET_DVR_SETUPALARM_PARAM();
