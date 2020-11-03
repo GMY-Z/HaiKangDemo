@@ -24,6 +24,7 @@ public class Haikangimp implements HCNetSDK.FMSGCallBack {
         Date today = new Date();
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         String[] sIP = new String[2];
+        System.out.println(lCommand);
         switch (lCommand) {
             case HCNetSDK.COMM_ALARM_ACS: //门禁主机报警信息
                 HCNetSDK.NET_DVR_ACS_ALARM_INFO strACSInfo = new HCNetSDK.NET_DVR_ACS_ALARM_INFO();
@@ -40,7 +41,6 @@ public class Haikangimp implements HCNetSDK.FMSGCallBack {
                 System.out.println(sAlarmType);
                 //报警设备IP地址
                 sIP = new String(pAlarmer.sDeviceIP).split("\0", 2);
-
                 if (strACSInfo.dwPicDataLen > 0) {
                     SimpleDateFormat sf = new SimpleDateFormat("yyyyMMddHHmmss");
                     String newName = sf.format(new Date());

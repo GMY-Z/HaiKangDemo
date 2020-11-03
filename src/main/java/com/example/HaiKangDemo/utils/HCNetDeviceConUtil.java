@@ -9,12 +9,12 @@ import java.io.UnsupportedEncodingException;
 
 public class HCNetDeviceConUtil {
 
-    // 登录IP
-    public static final String m_sDeviceIP = "登录IP";	//（登录IP 例如 192.168.0.1，它可以用来组网，可以在海康后台组建由这个ip控制的某几个海康摄像头）
-    // 登录名
-    public static final String USERNAME = "账号"; //（例如 admin）
-    // 密码
-    public static final String PASSWORD = "密码"; //（例如 123456）
+//    // 登录IP
+//    public static final String m_sDeviceIP = "登录IP";	//（登录IP 例如 192.168.0.1，它可以用来组网，可以在海康后台组建由这个ip控制的某几个海康摄像头）
+//    // 登录名
+//    public static final String USERNAME = "账号"; //（例如 admin）
+//    // 密码
+//    public static final String PASSWORD = "密码"; //（例如 123456）
     //设备端口号
     public static final Integer PORT = 8000;
     //加载海康HCNetSDK.dll文件的路径
@@ -31,6 +31,7 @@ public class HCNetDeviceConUtil {
                     "\\");
             try {
                 DLL_PATH = java.net.URLDecoder.decode(path, "utf-8");
+                System.out.println(DLL_PATH);
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }

@@ -16,10 +16,12 @@ import java.util.TimerTask;
  * @create 2020-10-15 16:32
  */
 
-@Service
-public class Haikang {
+public class HaiKangListenModule {
+    String ip = "10.12.44.21";
+    String user = "admin";
+    String password = "12345678a";
 
-    HCNetSDK hCNetSDK = HCNetSDK.INSTANCE;
+    public static HCNetSDK hCNetSDK = HCNetSDK.INSTANCE;
     //设备信息
     HCNetSDK.NET_DVR_DEVICEINFO_V30 m_strDeviceInfo;
     //已登录设备的IP地址
@@ -31,10 +33,16 @@ public class Haikang {
     //报警回调函数实现
     Haikangimp haikangimp;
 
-    public Haikang() {
+    public HaiKangListenModule() {
         this.initInformation();
     }
 
+    public HaiKangListenModule(String ip, String user, String password) {
+        this.ip = ip;
+        this.user = user;
+        this.password = password;
+        this.initInformation();
+    }
     /**
      * 初始化信息
      */
@@ -74,11 +82,11 @@ public class Haikang {
         } else {
             System.out.println("接口初始化成功");
         }
-        m_sDeviceIP = HCNetDeviceConUtil.m_sDeviceIP;
+        m_sDeviceIP = ip;
         m_strDeviceInfo = new HCNetSDK.NET_DVR_DEVICEINFO_V30();
         int iPort = HCNetDeviceConUtil.PORT;
         lUserID = hCNetSDK.NET_DVR_Login_V30(m_sDeviceIP,
-                (short) iPort, HCNetDeviceConUtil.USERNAME, HCNetDeviceConUtil.PASSWORD, m_strDeviceInfo);
+                (short) iPort, user, password, m_strDeviceInfo);
         int userID = lUserID;
         if (userID == -1) {
             System.out.println("注册失败" + "  失败原因是：" + hCNetSDK.NET_DVR_GetLastError());
