@@ -1,14 +1,17 @@
 package com.example.HaiKangDemo.utils;
 
+import com.example.HaiKangDemo.domain.EventAccessInfo;
+import com.example.HaiKangDemo.mq.RabbitMQProducer;
 import com.sun.jna.Pointer;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.*;
 import java.nio.ByteBuffer;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
 
 /**
  * @authon GMY
@@ -16,6 +19,12 @@ import java.util.Date;
  */
 
 public class Haikangimp implements HCNetSDK.FMSGCallBack {
+    private BufferedImage gateBufferedImage = null;
+    private String sSerialNumber;
+
+    public void setsSerialNumber(String sSerialNumber) {
+        this.sSerialNumber = sSerialNumber;
+    }
 
     @Override
     public void invoke(int lCommand, HCNetSDK.NET_DVR_ALARMER pAlarmer, Pointer pAlarmInfo, int dwBufLen, Pointer pUser) {
@@ -41,27 +50,56 @@ public class Haikangimp implements HCNetSDK.FMSGCallBack {
                 System.out.println(sAlarmType);
                 //报警设备IP地址
                 sIP = new String(pAlarmer.sDeviceIP).split("\0", 2);
+
+
                 if (strACSInfo.dwPicDataLen > 0) {
+                    //将字节写入文件
+                    long offset = 0;
+                    byte[] buffers = strACSInfo.pPicData.getByteArray(offset, strACSInfo.dwPicDataLen);
+
+                    EventAccessInfo eventAccessInfo = new EventAccessInfo();
+                    eventAccessInfo.setStudentId((String.valueOf(strACSInfo.struAcsEventInfo.dwEmployeeNo)).trim());
+//                eventAccessInfo.setStudentName();
+                    eventAccessInfo.setTime("" + System.currentTimeMillis());
+                    eventAccessInfo.setImageBuffer(buffers);
+                    eventAccessInfo.setDeviceId(sSerialNumber);
+                    eventAccessInfo.setCardId( new String(strACSInfo.struAcsEventInfo.byCardNo).trim());
+                    System.out.println(eventAccessInfo);
                     SimpleDateFormat sf = new SimpleDateFormat("yyyyMMddHHmmss");
                     String newName = sf.format(new Date());
-                    FileOutputStream fout;
+
+                    File path = new File("./GateSnapPicture/");
+                    if (!path.exists()) {
+                        path.mkdir();
+                    }
+                    String snapPicPath = path + "\\" + System.currentTimeMillis() + "GateSnapPicture.jpg";
+
+                    //发送到mq
+                    RabbitMQProducer rabbitMQProducer = (RabbitMQProducer) SpringUtil.getBean("RabbitMQProducer");
+                    rabbitMQProducer.send(eventAccessInfo);
+
+                    //保存图片在本地
+                    ByteArrayInputStream byteArrInputGlobal = new ByteArrayInputStream(buffers);
                     try {
-                        String filename = ".\\pic\\" + new String(pAlarmer.sDeviceIP).trim() +
-                                "_byCardNo[" + new String(strACSInfo.struAcsEventInfo.byCardNo).trim() +
-                                "_" + newName + "_Acs.jpg";
-                        fout = new FileOutputStream(filename);
-                        //将字节写入文件
-                        long offset = 0;
-                        ByteBuffer buffers = strACSInfo.pPicData.getByteBuffer(offset, strACSInfo.dwPicDataLen);
-                        byte[] bytes = new byte[strACSInfo.dwPicDataLen];
-                        buffers.rewind();
-                        buffers.get(bytes);
-                        fout.write(bytes);
-                        fout.close();
-                    } catch (FileNotFoundException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    } catch (IOException e) {
+                        gateBufferedImage = ImageIO.read(byteArrInputGlobal);
+                        if (gateBufferedImage != null) {
+                            ImageIO.write(gateBufferedImage, "jpg", new File(snapPicPath));
+                        }
+                    } catch (IOException e2) {
+                        e2.printStackTrace();
+                    }
+//                    FileOutputStream fout;
+                    try {
+//                        String filename = ".\\pic\\" + new String(pAlarmer.sDeviceIP).trim() +
+//                                "_byCardNo[" + new String(strACSInfo.struAcsEventInfo.byCardNo).trim() +
+//                                "_" + newName + "_Acs.jpg";
+//                        fout = new FileOutputStream(filename);
+//                        byte[] bytes = new byte[strACSInfo.dwPicDataLen];
+//                        buffers.rewind();
+//                        buffers.get(bytes);
+//                        fout.write(bytes);
+//                        fout.close();
+                    } catch (Exception e) {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
                     }

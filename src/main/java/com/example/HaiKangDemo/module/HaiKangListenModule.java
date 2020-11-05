@@ -1,4 +1,4 @@
-package com.example.HaiKangDemo.service;
+package com.example.HaiKangDemo.module;
 
 import com.example.HaiKangDemo.utils.HCNetDeviceConUtil;
 import com.example.HaiKangDemo.utils.HCNetSDK;
@@ -8,19 +8,17 @@ import com.sun.jna.Pointer;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
 
-import javax.swing.*;
-import java.util.TimerTask;
-
 /**
  * @authon GMY
  * @create 2020-10-15 16:32
  */
 
 public class HaiKangListenModule {
-    String ip = "10.12.44.21";
-    String user = "admin";
-    String password = "12345678a";
+    String ip;
+    String user;
+    String password;
 
+    //sdk
     public static HCNetSDK hCNetSDK = HCNetSDK.INSTANCE;
     //设备信息
     HCNetSDK.NET_DVR_DEVICEINFO_V30 m_strDeviceInfo;
@@ -55,7 +53,9 @@ public class HaiKangListenModule {
         Boolean login = this.Login();
         if (login) {
             //注册成功就进行布防
-            this.SetupAlarmChan();
+            int status = this.SetupAlarmChan();
+        }else{
+            //
         }
     }
 
@@ -100,10 +100,12 @@ public class HaiKangListenModule {
     /**
      * 报警布防
      */
-    public void SetupAlarmChan() {
+    public int SetupAlarmChan() {
         if (haikangimp == null) {
             haikangimp = new Haikangimp();
             Pointer pUser = null;
+            String s = new String(m_strDeviceInfo.sSerialNumber).trim();
+            haikangimp.setsSerialNumber(s);
             if (!hCNetSDK.NET_DVR_SetDVRMessageCallBack_V30(haikangimp, pUser)) {
                 System.out.println("设置回调函数失败!" + "  失败原因是：" + hCNetSDK.NET_DVR_GetLastError());
             }
@@ -116,8 +118,10 @@ public class HaiKangListenModule {
         lAlarmHandle = hCNetSDK.NET_DVR_SetupAlarmChan_V41(lUserID, m_strAlarmInfo);
         if (lAlarmHandle == -1) {
             System.out.println("布放失败" + "  失败原因是：" + hCNetSDK.NET_DVR_GetLastError());
+            return 0;
         } else {
             System.out.println("布防成功");
+            return 1;
         }
     }
 }
