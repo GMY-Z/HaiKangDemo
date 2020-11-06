@@ -45,6 +45,12 @@ public class Haikangimp implements HCNetSDK.FMSGCallBack {
                 sAlarmType = sAlarmType + "：门禁主机报警信息，卡号：" + new String(strACSInfo.struAcsEventInfo.byCardNo).trim() + "，卡类型：" +
                         strACSInfo.struAcsEventInfo.byCardType + "，报警主类型：" + strACSInfo.dwMajor + "，报警次类型：" + strACSInfo.dwMinor;
 
+                if (strACSInfo.dwMajor == 2 && strACSInfo.dwMinor == 39) {
+                    System.out.println(0);
+                }else if(strACSInfo.dwMinor == 1031){
+                    System.out.println(1);
+                }
+
                 newRow[0] = dateFormat.format(today);
                 //报警类型
                 System.out.println(sAlarmType);

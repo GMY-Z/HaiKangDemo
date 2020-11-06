@@ -3,10 +3,7 @@ package com.example.HaiKangDemo.module;
 import com.example.HaiKangDemo.utils.HCNetDeviceConUtil;
 import com.example.HaiKangDemo.utils.HCNetSDK;
 import com.example.HaiKangDemo.utils.Haikangimp;
-import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
-import org.springframework.stereotype.Controller;
-import org.springframework.stereotype.Service;
 
 /**
  * @authon GMY
@@ -31,6 +28,16 @@ public class HaiKangListenModule {
     //报警回调函数实现
     Haikangimp haikangimp;
 
+    String deviceId;
+
+    public String getDeviceId(){
+        return deviceId;
+    }
+
+    public int getlUserID() {
+        return lUserID;
+    }
+
     public HaiKangListenModule() {
         this.initInformation();
     }
@@ -52,10 +59,9 @@ public class HaiKangListenModule {
         //注册
         Boolean login = this.Login();
         if (login) {
+            deviceId = new String(m_strDeviceInfo.sSerialNumber).trim();
             //注册成功就进行布防
             int status = this.SetupAlarmChan();
-        }else{
-            //
         }
     }
 
@@ -88,6 +94,7 @@ public class HaiKangListenModule {
         lUserID = hCNetSDK.NET_DVR_Login_V30(m_sDeviceIP,
                 (short) iPort, user, password, m_strDeviceInfo);
         int userID = lUserID;
+        System.out.println(userID);
         if (userID == -1) {
             System.out.println("注册失败" + "  失败原因是：" + hCNetSDK.NET_DVR_GetLastError());
             return false;
@@ -104,8 +111,7 @@ public class HaiKangListenModule {
         if (haikangimp == null) {
             haikangimp = new Haikangimp();
             Pointer pUser = null;
-            String s = new String(m_strDeviceInfo.sSerialNumber).trim();
-            haikangimp.setsSerialNumber(s);
+            haikangimp.setsSerialNumber(deviceId);
             if (!hCNetSDK.NET_DVR_SetDVRMessageCallBack_V30(haikangimp, pUser)) {
                 System.out.println("设置回调函数失败!" + "  失败原因是：" + hCNetSDK.NET_DVR_GetLastError());
             }
@@ -124,4 +130,10 @@ public class HaiKangListenModule {
             return 1;
         }
     }
+
+
+    public Boolean getDevStatus(){
+         return hCNetSDK.NET_DVR_RemoteControl(lUserID, 20005, null, 0);
+    }
+
 }
