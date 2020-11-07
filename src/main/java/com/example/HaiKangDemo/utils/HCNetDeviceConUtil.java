@@ -1,5 +1,8 @@
 package com.example.HaiKangDemo.utils;
 
+import org.springframework.boot.system.ApplicationHome;
+
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 
 /**
@@ -27,14 +30,24 @@ public class HCNetDeviceConUtil {
                 HCNetSDK.class);
     */
         static {
-            String path = (HCNetSDKPath.class.getResource("/HCNetSDK/HCNetSDK.dll").getPath()).replaceAll("%20", " ").substring(1).replace("/",
-                    "\\");
-            try {
-                DLL_PATH = java.net.URLDecoder.decode(path, "utf-8");
-                System.out.println(DLL_PATH);
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
+//            本地
+//            String path = (HCNetSDKPath.class.getResource("/HCNetSDK/HCNetSDK.dll").getPath()).replaceAll("%20", " ").substring(1).replace("/",
+//                    "\\");
+//
+//            try {
+//                DLL_PATH = java.net.URLDecoder.decode(path, "utf-8");
+//                System.out.println(DLL_PATH);
+//            } catch (UnsupportedEncodingException e) {
+//                e.printStackTrace();
+//            }
+//            DLL_PATH = "./src/main/resources/HCNetSDK/HCNetSDK.dll";
+//            线上
+
+            ApplicationHome h = new ApplicationHome(HCNetSDKPath.class);
+            File jarF = h.getSource();
+            String p = jarF.getParentFile().toString();
+            System.out.println(p);
+            DLL_PATH = p + "\\HCNetSDK\\HCNetSDK.dll";
         }
     }
 }

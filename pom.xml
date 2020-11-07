@@ -84,6 +84,7 @@
 				<directory>src/main/resources</directory>
 				<includes>
 					<include>**/*.yml</include>
+					<include>**/*.dll</include>
 				</includes>
 			</resource>
 		</resources>
@@ -91,6 +92,9 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<includeSystemScope>true</includeSystemScope>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
